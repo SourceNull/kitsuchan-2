@@ -1,20 +1,17 @@
 import discord
-import requests
+import aiohttp
 from discord.ext import commands
-
 API_URL = "https://kitsu.io/api/edge/"
-
-# this is shit but meh...
-
 
 class Kitsu:
 
     @commands.command()
     async def anime(self, ctx, query: str):
         """Look up anime"""
-        with requests.get(API_URL + "anime", params={"filter[text]": query}) as resp:
-            resp = resp.json()["data"]
-
+        session = aiohttp.ClientSession()
+        async with session.get(url=(API_URL + "anime"), params={"filter[text]": query}) as resp:
+            r = await resp.json(content_type=None)
+            resp = r["data"] 
             if not resp:
                 return await ctx.send("The requested anime coudn't be found")
 
@@ -47,8 +44,10 @@ class Kitsu:
     @commands.command()
     async def manga(self, ctx, query: str):
         """Look up manga"""
-        with requests.get(API_URL + "manga", params={"filter[text]": query}) as resp:
-            resp = resp.json()["data"]
+        session = aiohttp.ClientSession()
+        async with session.get(url=(API_URL + "manga"), params={"filter[text]": query}) as resp:
+            r = await resp.json(content_type=None)
+            resp = r["data"]
 
             if not resp:
                 return await ctx.send("The requested manga coudn't be found")
